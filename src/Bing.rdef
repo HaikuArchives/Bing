@@ -1,0 +1,15 @@
+resource app_signature "application/x-vnd.djaybee.Bing";
+
+resource app_flags B_SINGLE_LAUNCH;
+
+resource app_version {
+	major  = 0,
+	middle = 4,
+	minor  = 0,
+
+	variety = B_APPV_BETA,
+	internal = 2,
+
+	short_info = "Bing version 0.4 beta 2",
+	long_info = "Bing version 0.4 beta 2\ncopyright 1998-2000 Jean-Baptiste QUERU"
+};
