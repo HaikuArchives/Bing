@@ -1,0 +1,38 @@
+Bing : Copyright (C) 1998-2000 Jean-Baptiste M. Queru
+
+Contact the author at:
+Jean-Baptiste M. Queru, 31 Camino Alto, Millbrae CA 94030, USA
+or by e-mail at : jb@queru.com
+
+Welcome to the Bing "ReadMe" file!
+
+Bing is a crazy pong clone that uses windows to draw the game
+elements. It is very cool-looking, and very CPU-intensive.
+I wrote it as a week-end hack in september '98, and it didn't really
+change since then.
+
+The controls are :
+left player: A,Z (A,Y on a German Keyboard, Q,W on a French one)
+right player: up and down arrow
+start a new game : space bar
+
+Revision history :
+
+0.4b2 : compile it for R5.0.3. tweak the makefile a bit.
+0.4 : massive source cleanup. support window de-activation
+0.3 : source cleanup. compiled for R4.5
+0.2 : fixed keys. added random serve
+0.1 : first release
+
+Todo (in no particular order) :
+
+computer player
+preference panel (keys, colors, difficulty)
+better handling of ffm
+make it handle low resolutions (640x480, 800x600) more gracefully
+use asynchronous controls w/ unmapped keys
+better handling of floating windows
+adaptative level
+demo mode
+investigate why it doesn't work with the most aggressive optimization levels
+more code cleanup
