@@ -20,6 +20,7 @@ or by e-mail at : jb@queru.com
 
 #include <Application.h>
 #include <stdlib.h>
+#include <cstdio>
 
 // the game settings
 
@@ -122,7 +123,8 @@ void BingControlWindow::Quit() {
 //
 // the game engine. should be divided into small parts.
 //
-
+extern int margc;
+extern char **margv;
 int32 BingControlWindow::Game() {
 	srand(system_time());
 	bigtime_t targettime;
@@ -138,16 +140,75 @@ int32 BingControlWindow::Game() {
 	theball->FMoveTo(BPoint(ballx,bally));
 	int mov;
 	targettime=system_time()+timeslice;
+	enum
+	{
+		GAME_MODE_DEFAULT = 0,
+		GAME_MODE_PLAYER_VS_PLAYER = 0,
+		GAME_MODE_PLAYER_VS_COMPUTER,
+		GAME_MODE_COMPUTER_VS_COMPUTER,
+		GAME_MODE__count,
+	};
+	int gamemode;
+
+	const char *gamemode_names[GAME_MODE__count] = {
+		"PLAYER_VS_PLAYER",
+		"PLAYER_VS_COMPUTER",
+		"COMPUTER_VS_COMPUTER",
+	};
+
+	{
+		int n = -1;
+		if (margc == 3) {
+			if ((strcmp(margv[1], "-g") == 0) || (strcmp(margv[1], "--gamemode") == 0)) {
+				n = atoi(margv[2]);
+			}
+		}
+
+		if (n < GAME_MODE__count && n >= 0) {
+			printf("Selecting gamemode %s\n", gamemode_names[n]);
+			gamemode = n;
+		}
+		else
+		{
+			printf("No gamemode specified\nSelecting gamemode %s\nUsage: %s -g NUM\nNUM can be from 0 to %d\n",
+					gamemode_names[GAME_MODE_DEFAULT], margv[0], GAME_MODE__count - 1);
+			gamemode = GAME_MODE_DEFAULT;
+		}
+	}
+
+
 	while(true) {
 		acquire_sem(semlock);
 		get_key_info(&ki);
 		mov=0;
-		if (ki.key_states[7]&8) {
-			mov--;
+
+		switch (gamemode) {
+			case GAME_MODE_PLAYER_VS_PLAYER: /*fallthrough*/
+			case GAME_MODE_PLAYER_VS_COMPUTER:
+				if (ki.key_states[7]&8) {
+					mov--;
+				}
+				if (ki.key_states[9]&8) {
+					mov++;
+				}
+			break;
+			case GAME_MODE_COMPUTER_VS_COMPUTER:
+				if (timenomove > 0)
+					break;
+				if (ballxspeed >= 0)
+					break;
+				if (yleftbat > bally) {
+					mov--;
+				}
+				if ((yleftbat + batysize) < bally) {
+					mov++;
+				}
+			break;
+			default:
+			/*Not Handled*/
+			break;
 		}
-		if (ki.key_states[9]&8) {
-			mov++;
-		}
+
 		if (mov==1) {
 			newyleftbat=yleftbat+batyspeed;
 			if (newyleftbat>1-batysize) {
@@ -162,12 +223,34 @@ int32 BingControlWindow::Game() {
 		}
 
 		mov=0;
-		if (ki.key_states[10]&1) {
-			mov--;
+
+		switch (gamemode) {
+			case GAME_MODE_PLAYER_VS_PLAYER:
+				if (ki.key_states[10]&1) {
+					mov--;
+				}
+				if (ki.key_states[12]&32) {
+					mov++;
+				}
+			break;
+			case GAME_MODE_PLAYER_VS_COMPUTER: /*fallthrough*/
+			case GAME_MODE_COMPUTER_VS_COMPUTER:
+				if (timenomove > 0)
+					break;
+				if (ballxspeed <= 0)
+					break;
+				if ((yrightbat + 0.5*batysize - 0.1*batysize) > bally) {
+					mov--;
+				}
+				if ((yrightbat + 0.5*batysize + 0.1*batysize) < bally) {
+					mov++;
+				}
+			break;
+			default:
+			/*Not Handled*/
+			break;
 		}
-		if (ki.key_states[12]&32) {
-			mov++;
-		}
+
 		if (mov==1) {
 			newyrightbat=yrightbat+batyspeed;
 			if (newyrightbat>1-batysize) {
