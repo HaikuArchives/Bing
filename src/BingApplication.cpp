@@ -23,8 +23,11 @@ or by e-mail at : jb@queru.com
 //
 // create the application object on the stack, and run it
 //
-
-int main() {
+int margc;
+char **margv;
+int main(int argc, char **argv) {
+	margc = argc;
+	margv = argv;
 	BingApplication().Run();
 	return 0;
 }
